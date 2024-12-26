@@ -14,9 +14,9 @@ fn main() {
     let string_slice: &str = &guess;
     let int_guess = string_slice.parse::<i32>();
 
-    println!("{}", type_of(int_guess));
+    println!("{}", type_of(int_guessP));
 
-
+    //nono ist ein geiler bastard
     //checkNum(generateNum(), int_guess);
 }
 
