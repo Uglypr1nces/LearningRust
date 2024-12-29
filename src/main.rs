@@ -1,28 +1,23 @@
-//Guessing game
 use rand::Rng;
 use std::io;
 use std::any::type_name;
 
 fn main() {
-    println!("Hello, seletct a number between 1-10!");
-    let mut guess = String::new();
+    println!("Guess the number!");
 
-    io::stdin()
-        .read_line(&mut guess)
+    println!("Please input your guess.");
+
+    let mut guess = String::new(); //creates a new mutuable (changable) variable and assigns it to be a string
+
+    io::stdin() // allows us to handle user input 
+        .read_line(&mut guess) 
         .expect("Failed to read line");
-    
-    let string_slice: &str = &guess;
-    let int_guess = string_slice.parse::<i32>();
 
-    println!("{}", type_of(int_guessP));
-
-    //nono ist ein geiler bastard
-    //checkNum(generateNum(), int_guess);
+    println!("You guessed: {}", guess);
 }
 
 fn generateNum() -> i32{
-    let mut rng = rand::thread_rng();
-    let random_number: i32 = rng.gen_range(0..10);
+    let random_number = rand::thread_rng().gen_range(0..=10);
     return random_number;
 }
 
