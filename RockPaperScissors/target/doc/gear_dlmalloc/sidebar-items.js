@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["DLMALLOC_INIT"],"fn":["get_alloced_mem_size"],"macro":["dlassert","dlverbose","dlverbose_no_flush"],"struct":["Dlmalloc","GlobalDlmalloc"]};

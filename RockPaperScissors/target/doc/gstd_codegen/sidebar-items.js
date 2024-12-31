@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"attr":["async_init","async_main","wait_create_program_for_reply","wait_for_reply"],"macro":["actor_id"]};

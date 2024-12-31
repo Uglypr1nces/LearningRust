@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["ConversionError"],"struct":["ActorId","CodeId","H160","H256","MessageHandle","MessageId","NonZeroU256","ReservationId","Ss58Address","U256"]};
