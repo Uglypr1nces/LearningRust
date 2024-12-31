@@ -1,0 +1,1 @@
+searchState.loadedDescShard("gear_stack_buffer", 0, "Stack allocations utils.\nThe maximum buffer size that can be allocated on the stack.\nCalls function <code>f</code> with provided uninitialized byte buffer …")

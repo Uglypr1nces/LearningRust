@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["SUBSTRATE_SS58_PREFIX","VARA_SS58_PREFIX"],"enum":["Error"],"fn":["default_ss58_version","set_default_ss58_version"],"struct":["RawSs58Address","Ss58Address"]};

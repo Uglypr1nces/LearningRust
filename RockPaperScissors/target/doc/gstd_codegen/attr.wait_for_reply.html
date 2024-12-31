@@ -1,0 +1,75 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Extends async methods `for_reply` and `for_reply_as` for sending methods."><title>wait_for_reply in gstd_codegen - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="gstd_codegen" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0 (90b35a623 2024-11-26)" data-channel="1.83.0" data-search-js="search-f0d225181b97f9a4.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="sidebar-items.js"></script><script defer src="../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc attr"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle" title="show sidebar"></button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../gstd_codegen/index.html">gstd_<wbr>codegen</a><span class="version">1.7.0</span></h2></div><div class="sidebar-elems"><section id="rustdoc-toc"><h2 class="location"><a href="#">wait_<wbr>for_<wbr>reply</a></h2><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#usage" title="Usage">Usage</a></li></ul></section><div id="rustdoc-modnav"><h2 class="in-crate"><a href="index.html">In crate gstd_<wbr>codegen</a></h2></div></div></nav><div class="sidebar-resizer"></div><main><div class="width-limiter"><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><span class="rustdoc-breadcrumbs"><a href="index.html">gstd_codegen</a></span><h1>Attribute Macro <span class="attr">wait_for_reply</span><button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../src/gstd_codegen/lib.rs.html#447-563">source</a> </span></div><pre class="rust item-decl"><code>#[wait_for_reply]</code></pre><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Extends async methods <code>for_reply</code> and <code>for_reply_as</code> for sending
+methods.</p>
+<h2 id="usage"><a class="doc-anchor" href="#usage">§</a>Usage</h2>
+<div class="example-wrap ignore"><a href="#" class="tooltip" title="This example is not tested">ⓘ</a><pre class="rust rust-example-rendered"><code><span class="kw">use </span>gcore::errors::Result;
+
+<span class="attr">#[wait_for_reply]
+</span><span class="kw">pub fn </span>send_bytes&lt;T: AsRef&lt;[u8]&gt;&gt;(program: ActorId, payload: T, value: u128) -&gt; <span class="prelude-ty">Result</span>&lt;MessageId&gt; {
+  gcore::msg::send(program.into(), payload.as_ref(), value)
+}</code></pre></div>
+<p>outputs:</p>
+
+<div class="example-wrap ignore"><a href="#" class="tooltip" title="This example is not tested">ⓘ</a><pre class="rust rust-example-rendered"><code><span class="doccomment">/// Same as [`send_bytes`](self::send_bytes), but the program
+/// will interrupt until the reply is received.
+///
+/// Argument `reply_deposit: u64` used to provide gas for
+/// future reply handling (skipped if zero).
+///
+/// # See also
+///
+/// - [`send_bytes_for_reply_as`](self::send_bytes_for_reply_as)
+</span><span class="kw">pub fn </span>send_bytes_for_reply&lt;T: AsRef&lt;[u8]&gt;&gt;(
+    program: ActorId,
+    payload: T,
+    value: u128,
+    reply_deposit: u64
+) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw">crate</span>::msg::MessageFuture&gt; {
+    <span class="comment">// Function call.
+    </span><span class="kw">let </span>waiting_reply_to = send_bytes(program, payload, value)<span class="question-mark">?</span>;
+
+    <span class="comment">// Depositing gas for future reply handling if not zero.
+    </span><span class="kw">if </span>reply_deposit != <span class="number">0 </span>{
+        <span class="kw">crate</span>::exec::reply_deposit(waiting_reply_to, reply_deposit)<span class="question-mark">?</span>;
+    }
+
+    <span class="comment">// Registering signal.
+    </span><span class="kw">crate</span>::async_runtime::signals().register_signal(waiting_reply_to);
+
+    <span class="prelude-val">Ok</span>(<span class="kw">crate</span>::msg::MessageFuture { waiting_reply_to })
+}
+
+<span class="doccomment">/// Same as [`send_bytes`](self::send_bytes), but the program
+/// will interrupt until the reply is received.
+///
+/// Argument `reply_deposit: u64` used to provide gas for
+/// future reply handling (skipped if zero).
+///
+/// The output should be decodable via SCALE codec.
+///
+/// # See also
+///
+/// - [`send_bytes_for_reply`](self::send_bytes_for_reply)
+/// - &lt;https://docs.substrate.io/reference/scale-codec&gt;
+</span><span class="kw">pub fn </span>send_bytes_for_reply_as&lt;T: AsRef&lt;[u8]&gt;, D: <span class="kw">crate</span>::codec::Decode&gt;(
+    program: ActorId,
+    payload: T,
+    value: u128,
+    reply_deposit: u64,
+) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw">crate</span>::msg::CodecMessageFuture&lt;D&gt;&gt; {
+    <span class="comment">// Function call.
+    </span><span class="kw">let </span>waiting_reply_to = send_bytes(program, payload, value)<span class="question-mark">?</span>;
+
+    <span class="comment">// Depositing gas for future reply handling if not zero.
+    </span><span class="kw">if </span>reply_deposit != <span class="number">0 </span>{
+        <span class="kw">crate</span>::exec::reply_deposit(waiting_reply_to, reply_deposit)<span class="question-mark">?</span>;
+    }
+
+    <span class="comment">// Registering signal.
+    </span><span class="kw">crate</span>::async_runtime::signals().register_signal(waiting_reply_to);
+
+    <span class="prelude-val">Ok</span>(<span class="kw">crate</span>::msg::CodecMessageFuture::&lt;D&gt; {
+        waiting_reply_to,
+        _marker: Default::default(),
+    })
+}</code></pre></div>
+</div></details></section></div></main></body></html>
